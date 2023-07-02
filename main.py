@@ -1,5 +1,7 @@
 import logging
 import os
+import signal
+import sys
 import time
 from datetime import datetime, timedelta
 
@@ -12,8 +14,12 @@ REFRESH_RATE = 90  # seconds
 
 logger = logging.getLogger()
 logging.basicConfig(level=logging.DEBUG,
+                    filename='app.log',
+                    filemode='a',
                     format='%(asctime)s - %(levelname)s - %(message)s',
                     datefmt='%d-%m-%y %H:%M:%S')
+
+records = []
 
 
 def read_relevant_stations():
@@ -40,7 +46,7 @@ def get_station_data():
     return None
 
 
-def write_to_parquet(records):
+def write_to_parquet():
     if len(records) < 0:
         return
 
@@ -55,14 +61,14 @@ def write_to_parquet(records):
     df = df.rename(columns={"mountpoint": "station"})
 
     if not os.path.isdir(directory):
-        os.mkdir(directory)
+        os.makedirs(directory)
 
     if not os.path.isfile(file_path):
         df.to_parquet(file_path, engine='fastparquet')
     else:
         df.to_parquet(file_path, engine='fastparquet', append=True)
 
-    logger.debug(f'Finished to write {len(new_songs)} new songs')
+    logger.debug(f'Finished to write {len(records)} new songs')
 
 
 def seconds_since_midnight():
@@ -70,11 +76,21 @@ def seconds_since_midnight():
     return (now - now.replace(hour=0, minute=0, second=0, microsecond=0)).total_seconds()
 
 
+def signal_handler(signal, frame):
+    logger.info('Got exit signal')
+    write_to_parquet()
+    logger.info('Stop')
+    sys.exit(0)
+
+
 if __name__ == '__main__':
+    logger.info('Start')
+
+    signal.signal(signal.SIGINT, signal_handler)
+
     relevant_stations = read_relevant_stations()
 
     playing = {}
-    records = []
     while True:
         # retrieve all songs currently playing on relevant stations
         stations = get_station_data()
