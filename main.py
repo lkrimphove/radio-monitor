@@ -10,8 +10,16 @@ import requests
 
 CURRENTLY_PLAYING_ENDPOINT = 'https://www.antenne.de/api/metadata/now'
 RELEVANT_DATA = ['artist', 'title', 'isrc', 'starttime', 'mountpoint']
-REFRESH_RATE = 90  # seconds
-ROOT_PATH = ""
+
+if 'REFRESH_RATE' in os.environ:
+    REFRESH_RATE = os.environ.get('REFRESH_RATE')
+else:
+    REFRESH_RATE = 90  # seconds
+
+if 'ROOT_PATH' in os.environ:
+    ROOT_PATH = os.environ.get('ROOT_PATH')
+else:
+    ROOT_PATH = ""
 
 logger = logging.getLogger()
 logging.basicConfig(level=logging.DEBUG,
