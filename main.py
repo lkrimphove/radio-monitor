@@ -85,6 +85,7 @@ def signal_handler(signal, frame):
 
 
 def main():
+    global records
     logger.info('Start')
 
     signal.signal(signal.SIGINT, signal_handler)
