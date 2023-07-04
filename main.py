@@ -27,7 +27,7 @@ else:
     ROOT_PATH = ""
 
 logger = logging.getLogger()
-logging.basicConfig(level=logging.DEBUG,
+logging.basicConfig(level=LOG_LVL,
                     filename=f'{ROOT_PATH}app.log',
                     filemode='a',
                     format='%(asctime)s - %(levelname)s - %(message)s',
