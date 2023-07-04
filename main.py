@@ -11,6 +11,11 @@ import requests
 CURRENTLY_PLAYING_ENDPOINT = 'https://www.antenne.de/api/metadata/now'
 RELEVANT_DATA = ['artist', 'title', 'isrc', 'starttime', 'mountpoint']
 
+if 'LOG_LVL' in os.environ:
+    LOG_LVL = os.environ.get('LOG_LVL')
+else:
+    LOG_LVL = logging.INFO
+
 if 'REFRESH_RATE' in os.environ:
     REFRESH_RATE = os.environ.get('REFRESH_RATE')
 else:
