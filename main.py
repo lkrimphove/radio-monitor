@@ -7,6 +7,8 @@ from datetime import datetime, timedelta
 
 import pandas as pd
 import requests
+from requests.adapters import HTTPAdapter
+from urllib3 import Retry
 
 CURRENTLY_PLAYING_ENDPOINT = 'https://www.antenne.de/api/metadata/now'
 RELEVANT_DATA = ['artist', 'title', 'isrc', 'starttime', 'mountpoint']
@@ -32,8 +34,13 @@ logging.basicConfig(level=LOG_LVL,
                     filemode='a',
                     format='%(asctime)s - %(levelname)s - %(message)s',
                     datefmt='%d-%m-%y %H:%M:%S')
+logging.getLogger().addHandler(logging.StreamHandler())
 
 records = []
+
+session = requests.Session()
+retry = Retry(connect=3, backoff_factor=0.5)
+adapter = HTTPAdapter(max_retries=retry)
 
 
 def read_relevant_stations():
@@ -53,10 +60,14 @@ def read_relevant_stations():
 
 
 def get_station_data():
-    # retrieve metadata of every song currently playing on every station
-    response = requests.get(url=CURRENTLY_PLAYING_ENDPOINT)
-    if response.status_code == 200:
-        return response.json()['data']
+    try:
+        # retrieve metadata of every song currently playing on every station
+        response = session.get(url=CURRENTLY_PLAYING_ENDPOINT)
+        if response.status_code == 200:
+            return response.json()['data']
+    except Exception as e:
+        logging.error("Exception occurred", exc_info=True)
+
     return None
 
 

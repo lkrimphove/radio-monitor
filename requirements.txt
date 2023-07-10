@@ -1,3 +1,4 @@
 requests~=2.31.0
 pandas~=2.0.3
-fastparquet~=2023.4.0
+fastparquet~=2023.7.0
+urllib3~=2.0.3
