@@ -151,7 +151,7 @@ def main():
             records.append(new_songs[station])
 
         if seconds_since_midnight() < REFRESH_RATE or len(records) > 10000:
-            write_to_parquet(records)
+            write_to_parquet()
             records = []
 
         time.sleep(REFRESH_RATE)
