@@ -68,14 +68,14 @@ def get_station_data():
     except Exception as e:
         logging.error("Exception occurred", exc_info=True)
 
-    return None
+    return []
 
 
 def write_to_parquet():
     if len(records) < 0:
         return
 
-    logger.debug(f'Starting to write {len(records)} new songs')
+    logger.info(f'Starting to write {len(records)} new songs')
 
     now = datetime.now()
     file_name = f'{now.date()}.parquet'
@@ -93,7 +93,7 @@ def write_to_parquet():
     else:
         df.to_parquet(file_path, engine='fastparquet', append=True)
 
-    logger.debug(f'Finished to write {len(records)} new songs')
+    logger.info(f'Finished to write {len(records)} new songs')
 
 
 def seconds_since_midnight():
@@ -150,7 +150,7 @@ def main():
             # store all new songs
             records.append(new_songs[station])
 
-        if seconds_since_midnight() < REFRESH_RATE or len(records) > 10000:
+        if seconds_since_midnight() <= REFRESH_RATE or len(records) > 100:
             write_to_parquet()
             records = []
 
