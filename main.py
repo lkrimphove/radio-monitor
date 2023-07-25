@@ -23,6 +23,11 @@ if 'REFRESH_RATE' in os.environ:
 else:
     REFRESH_RATE = 90  # seconds
 
+if 'MAX_BATCH' in os.environ:
+    MAX_BATCH = os.environ.get('MAX_BATCH')
+else:
+    MAX_BATCH = 1000
+
 if 'ROOT_PATH' in os.environ:
     ROOT_PATH = os.environ.get('ROOT_PATH')
 else:
@@ -35,6 +40,12 @@ logging.basicConfig(level=LOG_LVL,
                     format='%(asctime)s - %(levelname)s - %(message)s',
                     datefmt='%d-%m-%y %H:%M:%S')
 logging.getLogger().addHandler(logging.StreamHandler())
+
+logger.info(f'LOG_LVL: {LOG_LVL}')
+logger.info(f'REFRESH_RATE: {REFRESH_RATE}')
+logger.info(f'MAX_BATCH: {MAX_BATCH}')
+logger.info(f'ROOT_PATH: {ROOT_PATH}')
+
 
 records = []
 
@@ -150,7 +161,7 @@ def main():
             # store all new songs
             records.append(new_songs[station])
 
-        if seconds_since_midnight() <= REFRESH_RATE or len(records) > 100:
+        if seconds_since_midnight() <= REFRESH_RATE or len(records) > 1000:
             write_to_parquet()
             records = []
 
